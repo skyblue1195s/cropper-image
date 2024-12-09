@@ -1,6 +1,6 @@
 
 image-cropper {
-    max-height: 33vh;
+    max-height: 50vh;
     width: 500px;
     background: #cccccc0a;
   }
@@ -9,7 +9,7 @@ image-cropper {
     min-height: 300px;
     position: relative;
   }
-  
+
   .loader {
     position: absolute;
     top: 0;
