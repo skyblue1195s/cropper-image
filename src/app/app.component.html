@@ -1,0 +1,17 @@
+<input type="file" (change)="fileChangeEvent($event)" />
+
+<image-cropper
+    [ngStyle]="{width: '480px'}"
+    [imageChangedEvent]="imageChangedEvent"
+    [maintainAspectRatio]="true"
+    format="png"
+    (imageCropped)="imageCropped($event)"
+    (imageLoaded)="imageLoaded($event)"
+    (cropperReady)="cropperReady()"
+    (loadImageFailed)="loadImageFailed()"
+    [roundCropper]="true"
+    [hideResizeSquares]="true"
+></image-cropper>
+
+
+<img [src]="croppedImage" [ngStyle]="{width: '300px', borderRadius: '50%'}" />
