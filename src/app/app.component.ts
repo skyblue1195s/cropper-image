@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, SecurityContext, ViewChild } from '@angular/core';
 import { ThemeVariables, ThemeRef, lyl, StyleRenderer } from '@alyle/ui';
 import { Platform } from '@angular/cdk/platform';
 import {   STYLES as CROPPER_STYLES,
   ImgCropperConfig, ImgCropperErrorEvent, ImgCropperEvent, ImgCropperLoaderConfig, LyImageCropper } from '@alyle/ui/image-cropper';
 import { LySliderChange } from '@alyle/ui/slider';
+import { DomSanitizer } from '@angular/platform-browser';
 const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   ref.renderStyleSheet(CROPPER_STYLES);
   const cropper = ref.selectorsOf(CROPPER_STYLES);  return {
@@ -33,22 +34,27 @@ const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
 })
 export class AppComponent {
   classes = this.sRenderer.renderSheet(STYLES, 'root');
-  croppedImage?: string;
+  croppedImage?: any;
   scale: number;
   ready: boolean;
   minScale: number;
+
   @ViewChild(LyImageCropper, { static: true }) readonly cropper: LyImageCropper;
   myConfig: ImgCropperConfig = {
     width: 150, // Default `250`
     height: 150, // Default `200`
     fill: '#ff2997', // Default transparent if type = png else #000
-    type: 'image/png', // Or you can also use `image/jpeg`
-    round: true
+    type: 'image/jpeg', // Or you can also use `image/jpeg`
+    round: true,
+    keepAspectRatio: true,
+    responsiveArea: true,
+    antiAliased: false
   };
 
   constructor(
     readonly sRenderer: StyleRenderer,
-    private _platform: Platform
+    private _platform: Platform,
+    private sanit: DomSanitizer
   ) { }
   ngAfterViewInit() {
 
@@ -83,9 +89,33 @@ export class AppComponent {
 
   async imageChange(event: any) {
     const file = event.target.files[0];
-    alert(file.name);
-    const url = URL.createObjectURL(file)
-    this.cropper.loadImage({originalDataURL: url, height: 250, width: 250, scale: 2, type: 'jpeg'})
-    // this.cropper.selectInputEvent(event)
+    alert(file.type)
+       this.fileReader(file)
+  }
+
+  fileReader(file) {
+    const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const image = new Image();
+        image.onload = () => {
+          // Create a canvas and draw the image
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(image, 0, 0);
+            // Convert the canvas content to a Base64 string
+            const imageURL = canvas.toDataURL('image/png'); // Change MIME type if needed
+            console.log(imageURL);
+            this.croppedImage = canvas.toDataURL('image/png');;
+            this.cropper.loadImage({originalDataURL: this.croppedImage, height: 250, width: 250, scale: 0.5, type: 'jpeg'})
+
+          }
+        };
+        image.src = e.target?.result as string;
+
+      };
+      reader.readAsDataURL(file);
   }
 }
