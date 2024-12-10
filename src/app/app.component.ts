@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ImageCroppedEvent, ImageTransform, LoadedImage } from 'ngx-image-cropper';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -15,13 +16,19 @@ export class AppComponent {
     flipV: false,
   };
   imageChangedEvent: any = '';
-    croppedImage: any = '';
+    croppedImage: SafeUrl = '';
+
+    constructor(
+      private sanitizer: DomSanitizer
+    ) {
+    }
+  
 
     fileChangeEvent(event: any): void {
         this.imageChangedEvent = event;
     }
     imageCropped(event: ImageCroppedEvent) {
-        this.croppedImage = event.base64;
+      this.croppedImage = this.sanitizer.bypassSecurityTrustUrl(event.base64 || '');
     }
     imageLoaded(image: LoadedImage) {
         // show cropper
