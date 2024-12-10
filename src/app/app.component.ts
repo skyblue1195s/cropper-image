@@ -4,8 +4,6 @@ import { Platform } from '@angular/cdk/platform';
 import {   STYLES as CROPPER_STYLES,
   ImgCropperConfig, ImgCropperErrorEvent, ImgCropperEvent, ImgCropperLoaderConfig, LyImageCropper } from '@alyle/ui/image-cropper';
 import { LySliderChange } from '@alyle/ui/slider';
-import convert from 'heic-convert'
-import heic2any from 'heic2any';
 const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   ref.renderStyleSheet(CROPPER_STYLES);
   const cropper = ref.selectorsOf(CROPPER_STYLES);  return {
@@ -83,25 +81,11 @@ export class AppComponent {
     this.scale = event.value as number;
   }
 
-  imageChange(event: any) {
+  async imageChange(event: any) {
     const file = event.target.files[0];
-    this.fileReader(file);
-   
-    this.cropper.selectInputEvent(event)
-  }
-
-   fileReader(file: any) {
-    const reader = new FileReader();
-  reader.onload = async function(e) {
-      const blob = new Blob([new Uint8Array(file)], {type: file.type });
-      console.log(blob);
-      const data = await heic2any({
-        blob,
-        toType: "image/jpeg",
-        quality: 0.5, // cuts the quality and size by half
-      })
-      console.log(data);
-  };
-  reader.readAsArrayBuffer(file);
+    alert(file.name);
+    const url = URL.createObjectURL(file)
+    this.cropper.loadImage({originalDataURL: url, height: 250, width: 250, scale: 2, type: 'jpeg'})
+    // this.cropper.selectInputEvent(event)
   }
 }
