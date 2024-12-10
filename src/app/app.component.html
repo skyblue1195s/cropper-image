@@ -4,6 +4,7 @@
     [ngStyle]="{width: '480px'}"
     [imageChangedEvent]="imageChangedEvent"
     [maintainAspectRatio]="true"
+    [aspectRatio]="4 / 3"
     format="png"
     (imageCropped)="imageCropped($event)"
     (imageLoaded)="imageLoaded($event)"
@@ -11,6 +12,7 @@
     (loadImageFailed)="loadImageFailed()"
     [roundCropper]="true"
     [hideResizeSquares]="true"
+    [onlyScaleDown]="true"
 ></image-cropper>
 
 
