@@ -1,18 +1,21 @@
-<input type="file" (change)="fileChangeEvent($event)" />
+<input #_fileInput type="file" (change)="imageChange($event)" accept="image/*">
 
-<image-cropper
-    [imageChangedEvent]="imageChangedEvent"
-    [maintainAspectRatio]="true"
-    [aspectRatio]="4 / 3"
-    format="png"
-    (imageCropped)="imageCropped($event)"
-    (imageLoaded)="imageLoaded($event)"
-    (cropperReady)="cropperReady()"
-    (loadImageFailed)="loadImageFailed()"
-    [roundCropper]="true"
-    [hideResizeSquares]="true"
-    [onlyScaleDown]="true"
-></image-cropper>
+<ly-img-cropper
+[config]="myConfig"
+[(scale)]="scale"
+(minScale)="minScale = $event"
+(ready)="ready = true"
+(cleaned)="ready = false"
+(cropped)="onCropped($event)"
+(loaded)="onLoaded($event)"
+(error)="onError($event)"
+>
+<span>Drag and drop image</span>
+</ly-img-cropper>
 
 
-<img [src]="croppedImage" [ngStyle]="{width: '300px', borderRadius: '50%'}" />
+<button *ngIf="ready" color="accent" (click)="cropper.crop()" ly-button>
+crop
+</button>
+
+<div><img [class]="classes.cropResult" *ngIf="croppedImage" [src]="croppedImage"></div>
