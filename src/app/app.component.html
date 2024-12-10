@@ -1,9 +1,9 @@
 <input type="file" (change)="fileChangeEvent($event)" />
 
 <image-cropper
-    [ngStyle]="{width: '480px'}"
     [imageChangedEvent]="imageChangedEvent"
     [maintainAspectRatio]="true"
+    [aspectRatio]="1 / 1"
     format="png"
     (imageCropped)="imageCropped($event)"
     (imageLoaded)="imageLoaded($event)"
