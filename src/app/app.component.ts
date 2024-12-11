@@ -17,6 +17,7 @@ import {
 import { LySliderChange } from '@alyle/ui/slider';
 import { DomSanitizer } from '@angular/platform-browser';
 import { compressAccurately, EImageType } from 'image-conversion';
+import Compressor from 'compressorjs';
 
 const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   ref.renderStyleSheet(CROPPER_STYLES);
@@ -116,7 +117,6 @@ export class AppComponent {
       height: 500,
     }).then(async (res) => {
       const base64: any = await this.blobToBase64(res);
-      console.log(base64);
       if (base64) {
         const url = this.sanitizer.sanitize(
           SecurityContext.RESOURCE_URL,
