@@ -106,28 +106,26 @@ export class AppComponent {
     const file = event.target.files[0];
     this.imageChangedEvent = event;
     compressAccurately(file, {
-      size: 100, //The compressed image size is 100kb
       accuracy: 0.9, //the accuracy of image compression size,range 0.8-0.99,default 0.95;
       //this means if the picture size is set to 1000Kb and the
       //accuracy is 0.9, the image with the compression result
       //of 900Kb-1100Kb is considered acceptable;
       type: EImageType.JPEG,
-      width: 300,
-      height: 200,
-      orientation: 2,
-      scale: 0.5,
+      width: 900,
+      height: 900,
     }).then(async (res) => {
       const base64: any = await this.blobToBase64(res);
       console.log(base64);
       if (base64) {
-        const url = this.sanitizer.sanitize(
-          SecurityContext.RESOURCE_URL,
-          this.sanitizer.bypassSecurityTrustResourceUrl(base64)
-        );
+        // const url = this.sanitizer.sanitize(
+        //   SecurityContext.RESOURCE_URL,
+        //   this.sanitizer.bypassSecurityTrustResourceUrl(base64)
+        // );
         this.cropper.loadImage({
-          originalDataURL: url,
-          width: 480,
-          height: 480,
+          originalDataURL: base64,
+          scale: 0.745864772531767,
+          xOrigin: 642.380608078103,
+          yOrigin: 236.26357452128866,
         });
       }
     });
@@ -140,15 +138,15 @@ export class AppComponent {
       SecurityContext.RESOURCE_URL,
       this.sanitizer.bypassSecurityTrustResourceUrl(image.transformed.base64)
     );
-    this.croppedImage = url;
-    this.cropper.loadImage({
-      originalDataURL: url,
-      width: 480,
-      height: 480,
-    });
-    var div = document.getElementById('avatarImage');
-    div.appendChild(image.transformed.image);
-    console.log(image.transformed.image);
+    // this.croppedImage = url;
+    // this.cropper.loadImage({
+    //   originalDataURL: url,
+    //   width: 480,
+    //   height: 480,
+    // });
+    // var div = document.getElementById('avatarImage');
+    // div.appendChild(image.transformed.image);
+    // console.log(image.transformed.image);
   }
   cropperReady(e) {
     // cropper ready
