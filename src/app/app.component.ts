@@ -16,6 +16,7 @@ import {
 } from '@alyle/ui/image-cropper';
 import { LySliderChange } from '@alyle/ui/slider';
 import { DomSanitizer } from '@angular/platform-browser';
+import { compressAccurately, EImageType } from 'image-conversion';
 
 const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   ref.renderStyleSheet(CROPPER_STYLES);
@@ -104,14 +105,42 @@ export class AppComponent {
   async imageChange(event: any) {
     const file = event.target.files[0];
     this.imageChangedEvent = event;
+    compressAccurately(file, {
+      size: 100, //The compressed image size is 100kb
+      accuracy: 0.9, //the accuracy of image compression size,range 0.8-0.99,default 0.95;
+      //this means if the picture size is set to 1000Kb and the
+      //accuracy is 0.9, the image with the compression result
+      //of 900Kb-1100Kb is considered acceptable;
+      type: EImageType.JPEG,
+      width: 300,
+      height: 200,
+      orientation: 2,
+      scale: 0.5,
+    }).then(async (res) => {
+      const base64: any = await this.blobToBase64(res);
+      console.log(base64);
+      if (base64) {
+        const url = this.sanitizer.sanitize(
+          SecurityContext.RESOURCE_URL,
+          this.sanitizer.bypassSecurityTrustResourceUrl(base64)
+        );
+        this.cropper.loadImage({
+          originalDataURL: url,
+          width: 480,
+          height: 480,
+        });
+      }
+    });
   }
 
   imageLoaded(image: any) {
+    console.log(image);
     // show cropper
     const url = this.sanitizer.sanitize(
       SecurityContext.RESOURCE_URL,
       this.sanitizer.bypassSecurityTrustResourceUrl(image.transformed.base64)
     );
+    this.croppedImage = url;
     this.cropper.loadImage({
       originalDataURL: url,
       width: 480,
@@ -127,5 +156,13 @@ export class AppComponent {
 
   imageCropped(e) {
     console.log(e);
+  }
+
+  blobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
   }
 }
