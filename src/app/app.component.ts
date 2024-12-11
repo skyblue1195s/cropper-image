@@ -1,27 +1,40 @@
-import { ChangeDetectionStrategy, Component, SecurityContext, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  SecurityContext,
+  ViewChild,
+} from '@angular/core';
 import { ThemeVariables, ThemeRef, lyl, StyleRenderer } from '@alyle/ui';
 import { Platform } from '@angular/cdk/platform';
-import {   STYLES as CROPPER_STYLES,
-  ImgCropperConfig, ImgCropperErrorEvent, ImgCropperEvent, ImgCropperLoaderConfig, LyImageCropper } from '@alyle/ui/image-cropper';
+import {
+  STYLES as CROPPER_STYLES,
+  ImgCropperConfig,
+  ImgCropperErrorEvent,
+  ImgCropperEvent,
+  ImgCropperLoaderConfig,
+  LyImageCropper,
+} from '@alyle/ui/image-cropper';
 import { LySliderChange } from '@alyle/ui/slider';
 import { DomSanitizer } from '@angular/platform-browser';
+
 const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   ref.renderStyleSheet(CROPPER_STYLES);
-  const cropper = ref.selectorsOf(CROPPER_STYLES);  return {
-    root: lyl `{
+  const cropper = ref.selectorsOf(CROPPER_STYLES);
+  return {
+    root: lyl`{
       ${cropper.root} {
         max-width: 400px
         height: 300px
       }
     }`,
-    sliderContainer: lyl `{
+    sliderContainer: lyl`{
       text-align: center
       max-width: 400px
       margin: 14px
     }`,
-    cropResult: lyl `{
+    cropResult: lyl`{
       border-radius: 50%
-    }`
+    }`,
   };
 };
 
@@ -30,7 +43,7 @@ const STYLES = (theme: ThemeVariables, ref: ThemeRef) => {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [StyleRenderer]
+  providers: [StyleRenderer],
 })
 export class AppComponent {
   classes = this.sRenderer.renderSheet(STYLES, 'root');
@@ -48,16 +61,17 @@ export class AppComponent {
     round: true,
     keepAspectRatio: true,
     responsiveArea: true,
-    antiAliased: false
+    antiAliased: false,
   };
+
+  imageChangedEvent: any = '';
 
   constructor(
     readonly sRenderer: StyleRenderer,
     private _platform: Platform,
     private sanit: DomSanitizer
-  ) { }
+  ) {}
   ngAfterViewInit() {
-
     // demo: Load image from URL and update position, scale, rotate
     // this is supported only for browsers
     if (this._platform.isBrowser) {
@@ -66,11 +80,11 @@ export class AppComponent {
         xOrigin: 642.380608078103,
         yOrigin: 236.26357452128866,
         // rotation: 90,
-        originalDataURL: 'https://firebasestorage.googleapis.com/v0/b/alyle-ui.appspot.com/o/img%2Flarm-rmah-47685-unsplash-1.png?alt=media&token=96a29be5-e3ef-4f71-8437-76ac8013372c'
+        originalDataURL:
+          'https://firebasestorage.googleapis.com/v0/b/alyle-ui.appspot.com/o/img%2Flarm-rmah-47685-unsplash-1.png?alt=media&token=96a29be5-e3ef-4f71-8437-76ac8013372c',
       };
       this.cropper.loadImage(config);
     }
-
   }
 
   onCropped(e: ImgCropperEvent) {
@@ -89,33 +103,26 @@ export class AppComponent {
 
   async imageChange(event: any) {
     const file = event.target.files[0];
-    alert(file.type)
-       this.fileReader(file)
+    this.imageChangedEvent = event;
   }
 
-  fileReader(file) {
-    const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        const image = new Image();
-        image.onload = () => {
-          // Create a canvas and draw the image
-          const canvas = document.createElement('canvas');
-          canvas.width = image.width;
-          canvas.height = image.height;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(image, 0, 0);
-            // Convert the canvas content to a Base64 string
-            const imageURL = canvas.toDataURL('image/png'); // Change MIME type if needed
-            console.log(imageURL);
-            this.croppedImage = canvas.toDataURL('image/png');;
-            this.cropper.loadImage({originalDataURL: this.croppedImage, height: 250, width: 250, scale: 0.5, type: 'jpeg'})
+  imageLoaded(image: any) {
+    // show cropper
 
-          }
-        };
-        image.src = e.target?.result as string;
+    var div = document.getElementById('avatarImage');
+    div.appendChild(image.transformed.image);
+    console.log(image.transformed.image);
+  }
+  cropperReady(e) {
+    // cropper ready
+  }
 
-      };
-      reader.readAsDataURL(file);
+  imageCropped(e) {
+    console.log(e);
+    this.cropper.loadImage({
+      originalDataURL: e.base64,
+      width: 480,
+      height: 480,
+    });
   }
 }

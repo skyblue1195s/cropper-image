@@ -19,3 +19,13 @@ crop
 </button>
 
 <div><img [class]="classes.cropResult" [src]="croppedImage" width="200" height="200"></div>
+<div id="avatarImage"></div>
+<image-cropper
+    [imageChangedEvent]="imageChangedEvent"
+    [maintainAspectRatio]="true"
+    [aspectRatio]="4 / 3"
+    format="png"
+    (imageLoaded)="imageLoaded($event)"
+    (imageCropped)="imageCropped($event)"
+    (cropperReady)="cropperReady($event)"
+></image-cropper>
