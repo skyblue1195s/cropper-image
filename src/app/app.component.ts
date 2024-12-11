@@ -69,7 +69,7 @@ export class AppComponent {
   constructor(
     readonly sRenderer: StyleRenderer,
     private _platform: Platform,
-    private sanit: DomSanitizer
+    private sanitizer: DomSanitizer
   ) {}
   ngAfterViewInit() {
     // demo: Load image from URL and update position, scale, rotate
@@ -108,7 +108,15 @@ export class AppComponent {
 
   imageLoaded(image: any) {
     // show cropper
-
+    const url = this.sanitizer.sanitize(
+      SecurityContext.RESOURCE_URL,
+      this.sanitizer.bypassSecurityTrustResourceUrl(image.transformed.base64)
+    );
+    this.cropper.loadImage({
+      originalDataURL: url,
+      width: 480,
+      height: 480,
+    });
     var div = document.getElementById('avatarImage');
     div.appendChild(image.transformed.image);
     console.log(image.transformed.image);
@@ -119,10 +127,5 @@ export class AppComponent {
 
   imageCropped(e) {
     console.log(e);
-    this.cropper.loadImage({
-      originalDataURL: e.base64,
-      width: 480,
-      height: 480,
-    });
   }
 }
