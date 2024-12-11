@@ -106,26 +106,25 @@ export class AppComponent {
     const file = event.target.files[0];
     this.imageChangedEvent = event;
     compressAccurately(file, {
-      accuracy: 0.9, //the accuracy of image compression size,range 0.8-0.99,default 0.95;
+      size: 100, //The compressed image size is 100kb
+      accuracy: 0.8, //the accuracy of image compression size,range 0.8-0.99,default 0.95;
       //this means if the picture size is set to 1000Kb and the
       //accuracy is 0.9, the image with the compression result
       //of 900Kb-1100Kb is considered acceptable;
       type: EImageType.JPEG,
-      width: 900,
-      height: 900,
+      width: 500,
+      height: 500,
     }).then(async (res) => {
       const base64: any = await this.blobToBase64(res);
       console.log(base64);
       if (base64) {
-        // const url = this.sanitizer.sanitize(
-        //   SecurityContext.RESOURCE_URL,
-        //   this.sanitizer.bypassSecurityTrustResourceUrl(base64)
-        // );
+        const url = this.sanitizer.sanitize(
+          SecurityContext.RESOURCE_URL,
+          this.sanitizer.bypassSecurityTrustResourceUrl(base64)
+        );
         this.cropper.loadImage({
-          originalDataURL: base64,
-          scale: 0.745864772531767,
-          xOrigin: 642.380608078103,
-          yOrigin: 236.26357452128866,
+          originalDataURL: url,
+          scale: 0.2,
         });
       }
     });
